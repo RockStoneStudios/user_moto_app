@@ -1,0 +1,43 @@
+name: SopeGo
+description: "Aplicacion de transporte en el municipio de  sopetran"
+publish_to: 'none'
+version: 0.9.0
+
+environment:
+  sdk: '>=3.3.1 <4.0.0'
+
+dependencies:
+  flutter:
+
+    sdk: flutter
+  firebase_core: ^2.24.0
+  connectivity_plus:
+  firebase_auth:
+  firebase_database:
+  firebase_storage:
+  google_maps_flutter:
+  permission_handler:
+  geolocator:
+  http:
+  provider:
+  flutter_polyline_points:
+  loading_animation_widget:
+  flutter_geofire: ^2.0.3
+  restart_app:
+  url_launcher:
+  location: ^5.0.0
+  geocoding: ^2.2.0
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - themes/
+    - assets/images/logo_m.jpg

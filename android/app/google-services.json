@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "685620528539",
+    "firebase_url": "https://mototax-flutter-default-rtdb.firebaseio.com",
+    "project_id": "mototax-flutter",
+    "storage_bucket": "mototax-flutter.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:685620528539:android:e57459d8c82641df890d3e",
+        "android_client_info": {
+          "package_name": "com.rockstone.user_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyACivQHPIGljEjDpn7uOI1NKX322msXsmo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

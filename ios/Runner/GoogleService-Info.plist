@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyDJGnSyP3gqwwfGgM_EpYQPJ4BRZ2vClak</string>
+	<key>GCM_SENDER_ID</key>
+	<string>685620528539</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.rockstone.userApp</string>
+	<key>PROJECT_ID</key>
+	<string>mototax-flutter</string>
+	<key>STORAGE_BUCKET</key>
+	<string>mototax-flutter.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:685620528539:ios:2ddba3fed32c8e8b890d3e</string>
+	<key>DATABASE_URL</key>
+	<string>https://mototax-flutter-default-rtdb.firebaseio.com</string>
+</dict>
+</plist>
