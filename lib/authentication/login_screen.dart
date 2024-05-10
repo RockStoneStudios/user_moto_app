@@ -1,18 +1,9 @@
 import 'package:firebase_database/firebase_database.dart';
-// import 'package:flutter/material.dart';
-// import 'package:users_app/authentication/signup_screen.dart';
-// import 'package:users_app/global/global_var.dart';
-
 import 'package:firebase_auth/firebase_auth.dart';
-
 import '../global/global_var.dart';
 import '../methods/common_methods.dart';
-import 'package:SopeGo/methods/common_methods.dart';
-// import '../pages/home_page.dart';
-// import '../widgets/loading_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:SopeGo/authentication/signup_screen.dart';
-
 import '../pages/home_page.dart';
 import '../widgets/loading_dialogs.dart';
 
@@ -30,7 +21,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   checkIfNetworkIsAvailable() {
     cMethods.checkConnectivity(context);
-
     signInFormValidation();
   }
 
@@ -58,37 +48,40 @@ class _LoginScreenState extends State<LoginScreen> {
       email: emailTextEditingController.text.trim(),
       password: passwordTextEditingController.text.trim(),
     )
-        .catchError((errorMsg) {
+        .then((userCredential) {
+      if (mounted) {
+        Navigator.pop(context);
+      }
+      return userCredential.user;
+    }).catchError((errorMsg) {
       Navigator.pop(context);
       cMethods.displaySnackBar(errorMsg.toString(), context);
-    }))
-        .user;
-
-    if (!context.mounted) return;
-    Navigator.pop(context);
+    }));
 
     if (userFirebase != null) {
-      DatabaseReference usersRef = FirebaseDatabase.instance
-          .ref()
-          .child("users")
-          .child(userFirebase.uid);
+      DatabaseReference usersRef =
+      FirebaseDatabase.instance.ref().child("users").child(userFirebase.uid);
       await usersRef.once().then((snap) {
-        if (snap.snapshot.value != null) {
-          if ((snap.snapshot.value as Map)["blockStatus"] == "no") {
-            userName = (snap.snapshot.value as Map)["name"];
-            userPhone = (snap.snapshot.value as Map)["phone"];
-            Navigator.push(
-                context, MaterialPageRoute(builder: (c) => const HomePage()));
+        if (mounted) {
+          if (snap.snapshot.value != null) {
+            if ((snap.snapshot.value as Map)["blockStatus"] == "no") {
+              userName = (snap.snapshot.value as Map)["name"];
+              userPhone = (snap.snapshot.value as Map)["phone"];
+              if (mounted) {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (c) => const HomePage()));
+              }
+            } else {
+              FirebaseAuth.instance.signOut();
+              cMethods.displaySnackBar(
+                  "Tu estas bloqueado. Contacta admin: rockstonestudios666@gmail.com",
+                  context);
+            }
           } else {
             FirebaseAuth.instance.signOut();
             cMethods.displaySnackBar(
-                "Tu estas bloqueado. Contacta admin: rockstonestudios666@gmail.com",
-                context);
+                "su registro no existe como Usuario.", context);
           }
-        } else {
-          FirebaseAuth.instance.signOut();
-          cMethods.displaySnackBar(
-              "su registro no existe como Usuario.", context);
         }
       });
     }
@@ -120,8 +113,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-
-              //text fields + button
               Padding(
                 padding: const EdgeInsets.all(22),
                 child: Column(
@@ -178,12 +169,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   ],
                 ),
               ),
-
               const SizedBox(
                 height: 12,
               ),
-
-              //textbutton
               TextButton(
                   onPressed: () {
                     Navigator.push(context,

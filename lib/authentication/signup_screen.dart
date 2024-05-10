@@ -1,14 +1,7 @@
-// import 'package:connectivity_plus/connectivity_plus.dart';
-
 import 'package:firebase_database/firebase_database.dart';
-// import 'package:flutter/material.dart';
-// import 'package:users_app/authentication/login_screen.dart';
-// import 'package:users_app/methods/common_methods.dart';
-// import 'package:users_app/pages/home_page.dart';
-// import 'package:users_app/widgets/loading_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/services/text_formatter.dart';
+import 'package:flutter/services.dart';
 
 import '../methods/common_methods.dart';
 import '../pages/home_page.dart';
@@ -24,12 +17,10 @@ class SignUpScreen extends StatefulWidget {
 
 class _SignUpScreenState extends State<SignUpScreen> {
   TextEditingController userNameTextEditingController = TextEditingController();
-  TextEditingController userPhoneTextEditingController =
-  TextEditingController();
+  TextEditingController userPhoneTextEditingController = TextEditingController();
   TextEditingController emailTextEditingController = TextEditingController();
   TextEditingController passwordTextEditingController = TextEditingController();
   CommonMethods cMethods = CommonMethods();
-
 
   final RegExp _emojiRegex = RegExp(
     r"[\u{1F600}-\u{1F64F}" // Emoticons
@@ -41,27 +32,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
     unicode: true,
   );
 
-
-
-
-      checkIfNetworkIsAvailable() {
+  checkIfNetworkIsAvailable() {
     cMethods.checkConnectivity(context);
-
     signUpFormValidation();
   }
 
   signUpFormValidation() {
     if (userNameTextEditingController.text.trim().length < 3) {
-      cMethods.displaySnackBar(
-          "Su Nombre debe tener 4 caracteres.", context);
+      cMethods.displaySnackBar("Su Nombre debe tener 4 caracteres.", context);
     } else if (userPhoneTextEditingController.text.trim().length < 7) {
-      cMethods.displaySnackBar(
-          "Su Numero celular debe tener 10 numers.", context);
+      cMethods.displaySnackBar("Su Numero celular debe tener 10 numers.", context);
     } else if (!emailTextEditingController.text.contains("@")) {
       cMethods.displaySnackBar("Por favor escriba un correo valido.", context);
     } else if (passwordTextEditingController.text.trim().length < 5) {
-      cMethods.displaySnackBar(
-          "Tu Contraseña debe tener 6 o mas caracteres.", context);
+      cMethods.displaySnackBar("Tu Contraseña debe tener 6 o mas caracteres.", context);
     } else {
       registerNewUser();
     }
@@ -71,8 +55,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (BuildContext context) =>
-          LoadingDialog(messageText: "Registrando ..."),
+      builder: (BuildContext context) => LoadingDialog(messageText: "Registrando ..."),
     );
 
     final User? userFirebase = (await FirebaseAuth.instance
@@ -80,42 +63,46 @@ class _SignUpScreenState extends State<SignUpScreen> {
       email: emailTextEditingController.text.trim(),
       password: passwordTextEditingController.text.trim(),
     )
-        .catchError((errorMsg) {
+        .then((userCredential) {
+      if (mounted) {
+        Navigator.pop(context);
+      }
+      return userCredential.user;
+    }).catchError((errorMsg) {
       Navigator.pop(context);
       cMethods.displaySnackBar(errorMsg.toString(), context);
-    }))
-        .user;
+    }));
 
-    if (!context.mounted) return;
-    Navigator.pop(context);
+    if (userFirebase != null) {
+      DatabaseReference usersRef = FirebaseDatabase.instance.ref().child("users").child(userFirebase.uid);
+      Map userDataMap = {
+        "name": userNameTextEditingController.text.trim(),
+        "email": emailTextEditingController.text.trim(),
+        "phone": userPhoneTextEditingController.text.trim(),
+        "id": userFirebase.uid,
+        "blockStatus": "no",
+      };
+      await usersRef.set(userDataMap);
 
-    DatabaseReference usersRef =
-    FirebaseDatabase.instance.ref().child("users").child(userFirebase!.uid);
-    Map userDataMap = {
-      "name": userNameTextEditingController.text.trim(),
-      "email": emailTextEditingController.text.trim(),
-      "phone": userPhoneTextEditingController.text.trim(),
-      "id": userFirebase.uid,
-      "blockStatus": "no",
-    };
-    usersRef.set(userDataMap);
-
-    Navigator.push(context, MaterialPageRoute(builder: (c) => const HomePage()));
+      if (mounted) {
+        Navigator.push(context, MaterialPageRoute(builder: (c) => const HomePage()));
+      }
+    }
   }
-
 
   @override
   Widget build(BuildContext context) {
-
-
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: Column(
             children: [
-              Image.asset("assets/images/logo.png",width: 190, height: 190,),
-
+              Image.asset(
+                "assets/images/logo.png",
+                width: 190,
+                height: 190,
+              ),
               const Text(
                 "Crea un Usuario",
                 style: TextStyle(
@@ -123,8 +110,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-
-              //text fields + button
               Padding(
                 padding: const EdgeInsets.all(22),
                 child: Column(
@@ -147,8 +132,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         fontSize: 16,
                       ),
                     ),
-
-
                     const SizedBox(
                       height: 22,
                     ),
@@ -183,12 +166,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         fontSize: 16,
                       ),
                       onChanged: (value) {
-                        // Verificar si el texto contiene emojis y eliminarlos
                         if (_emojiRegex.hasMatch(value)) {
                           setState(() {
-                            emailTextEditingController.text =
-                                emailTextEditingController.text.replaceAll(_emojiRegex, '');
-                            // Mantener el cursor al final del texto
+                            emailTextEditingController.text = emailTextEditingController.text.replaceAll(_emojiRegex, '');
                             emailTextEditingController.selection = TextSelection.fromPosition(
                               TextPosition(offset: emailTextEditingController.text.length),
                             );
@@ -196,7 +176,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         }
                       },
                     ),
-
                     const SizedBox(
                       height: 22,
                     ),
@@ -224,8 +203,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       },
                       style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.purple,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 80, vertical: 10)),
+                          padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 10)),
                       child: const Text(
                         "Registrarse",
                         style: TextStyle(fontSize: 18),
@@ -234,34 +212,30 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ],
                 ),
               ),
-
               const SizedBox(
                 height: 12,
               ),
-
-              //textbutton
               TextButton(
-                  onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (c) => const LoginScreen()));
-                  },
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Ya tienes cuenta? ",
-                        style: TextStyle(color: Colors.grey, fontSize: 15),
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Text(
-                        'Logueate',
-                        style:
-                        TextStyle(fontSize: 18, color: Colors.deepPurple),
-                      )
-                    ],
-                  )),
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (c) => const LoginScreen()));
+                },
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Ya tienes cuenta? ",
+                      style: TextStyle(color: Colors.grey, fontSize: 15),
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Text(
+                      'Logueate',
+                      style: TextStyle(fontSize: 18, color: Colors.deepPurple),
+                    )
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -269,7 +243,3 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 }
-
-
-
-

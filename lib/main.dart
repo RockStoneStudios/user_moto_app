@@ -15,12 +15,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  final permissionStatus = await Permission.locationWhenInUse.status;
-  if (permissionStatus.isDenied) {
-    runApp(const LocationPermissionApp());
-  } else {
-    runApp(const MyApp());
-  }
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -34,9 +29,25 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'SopeGo',
         theme: ThemeData.dark().copyWith(scaffoldBackgroundColor: Colors.black),
-        home: FirebaseAuth.instance.currentUser == null
-            ? const LoginScreen()
-            : const HomePage(),
+        home: FutureBuilder<PermissionStatus>(
+          future: Permission.locationWhenInUse.status,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const SizedBox();
+            } else if (snapshot.hasData) {
+              final permissionStatus = snapshot.data!;
+              if (permissionStatus.isDenied) {
+                return const LocationPermissionDialog();
+              } else {
+                return FirebaseAuth.instance.currentUser == null
+                    ? const LoginScreen()
+                    : const HomePage();
+              }
+            } else {
+              return const SizedBox();
+            }
+          },
+        ),
       ),
     );
   }
